@@ -1,0 +1,8 @@
+services:
+  app:
+    build:
+      target: dev
+    environment:
+      APP_ENV: dev
+    volumes:
+      - .:/var/www/html
