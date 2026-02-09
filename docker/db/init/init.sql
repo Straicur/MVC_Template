@@ -1,5 +1,7 @@
-CREATE DATABASE IF NOT EXISTS mydatabase_test;
+CREATE DATABASE app_test;
 
-GRANT ALL PRIVILEGES ON mydatabase_test.* TO 'user'@'%';
+GRANT ALL PRIVILEGES ON DATABASE app_test TO "user";
 
-FLUSH PRIVILEGES;
+\c app_test
+GRANT ALL ON SCHEMA public TO "user";
+
