@@ -11,8 +11,8 @@ use App\ExceptionManagement\Exceptions\ApiException\UnauthorizedException\Unauth
 use App\ExceptionManagement\Exceptions\ApiException\UnauthorizedException\UnauthorizedExceptionModel;
 use App\ExceptionManagement\Exceptions\ApiException\UnprocessableContentException\UnprocessableContentException;
 use App\ExceptionManagement\Exceptions\ApiException\UnprocessableContentException\UnprocessableContentExceptionModel;
-use App\Repository\UserRepository;
 use App\Security\AuthServiceInterface;
+use App\Security\ConfigServiceInterface;
 use App\Security\CookieService;
 use App\Security\CookieServiceInterface;
 use App\Service\RequestServiceInterface;
@@ -43,9 +43,9 @@ final class LoginController extends AbstractController
 {
     public function __construct(
         private readonly RequestServiceInterface $requestService,
-        private readonly UserRepository $userRepository,
         private readonly CookieServiceInterface $cookieService,
         private readonly AuthServiceInterface $authService,
+        private readonly ConfigServiceInterface $configService,
     ) {}
 
     /**
@@ -79,20 +79,10 @@ final class LoginController extends AbstractController
             throw new BadRequestException();
         }
 
-        $user = $this->userRepository->findUserByEmail($loginRequestDTO->getEmail());
-
-        if (null === $user) {
-            throw new UnauthorizedException();
-        }
-
-        $validCredentials = password_verify(
-            password: $loginRequestDTO->getPassword(),
-            hash: $user->getPassword()
+        $user = $this->authService->getUserByEmailAndPassword(
+            email: $loginRequestDTO->getEmail(),
+            password: $loginRequestDTO->getPassword()
         );
-
-        if (false === $validCredentials) {
-            throw new UnauthorizedException();
-        }
 
         $response = new Response();
 
@@ -101,7 +91,7 @@ final class LoginController extends AbstractController
             $this->cookieService->prepareAuthCookie(
                 name: CookieService::ACCESS_TOKEN,
                 token: $token,
-                expire: $this->authService->getAccessTokenTimeToLive(),
+                expire: $this->configService->getAccessTokenTimeToLive(),
             )
         );
 
@@ -110,7 +100,7 @@ final class LoginController extends AbstractController
             $this->cookieService->prepareAuthCookie(
                 name: CookieService::REFRESH_TOKEN,
                 token: $refreshToken->getRefreshToken(),
-                expire: $this->authService->getRefreshTokenTimeToLive(),
+                expire: $this->configService->getRefreshTokenTimeToLive(),
             )
         );
 

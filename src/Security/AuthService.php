@@ -6,6 +6,7 @@ namespace App\Security;
 
 use App\Entity\User;
 use App\ExceptionManagement\Exceptions\ApiException\UnauthorizedException\UnauthorizedException;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenInterface;
@@ -13,7 +14,6 @@ use Lexik\Bundle\JWTAuthenticationBundle\Security\Authenticator\Token\JWTPostAut
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Override;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -22,12 +22,34 @@ final readonly class AuthService implements AuthServiceInterface
 {
     public function __construct(
         private JWTTokenManagerInterface $JWTTokenManager,
-        private ParameterBagInterface $config,
+        private UserRepository $userRepository,
         private TokenStorageInterface $tokenStorage,
         private LoggerInterface $logger,
         private RefreshTokenGeneratorInterface $refreshTokenGenerator,
         private EntityManagerInterface $entityManager,
+        private ConfigServiceInterface $configService,
     ) {}
+
+    #[Override]
+    public function getUserByEmailAndPassword(string $email, string $password): User
+    {
+        $user = $this->userRepository->findUserByEmail($email);
+
+        if (null === $user) {
+            throw new UnauthorizedException();
+        }
+
+        $validCredentials = password_verify(
+            password: $password,
+            hash: $user->getPassword()
+        );
+
+        if (false === $validCredentials) {
+            throw new UnauthorizedException();
+        }
+
+        return $user;
+    }
 
     #[Override]
     public function createToken(UserInterface $user): string
@@ -44,18 +66,6 @@ final readonly class AuthService implements AuthServiceInterface
         $this->tokenStorage->setToken($securityToken);
 
         return $jwt;
-    }
-
-    #[Override]
-    public function getAccessTokenTimeToLive(): int
-    {
-        return $this->config->get('lexik_jwt_authentication.token_ttl');
-    }
-
-    #[Override]
-    public function getRefreshTokenTimeToLive(): int
-    {
-        return $this->config->get('gesdinet_jwt_refresh_token.ttl');
     }
 
     #[Override]
@@ -88,7 +98,7 @@ final readonly class AuthService implements AuthServiceInterface
     {
         $refreshToken = $this->refreshTokenGenerator->createForUserWithTtl(
             user: $user,
-            ttl: $this->getRefreshTokenTimeToLive()
+            ttl: $this->configService->getRefreshTokenTimeToLive()
         );
 
         $this->entityManager->persist($refreshToken);

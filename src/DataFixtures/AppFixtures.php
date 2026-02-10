@@ -6,12 +6,11 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Util\PasswordHasher;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Override;
-
-use const PASSWORD_BCRYPT;
 
 class AppFixtures extends Fixture implements FixtureGroupInterface
 {
@@ -24,13 +23,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
     {
         $user = new User(
             'mosinskidamian11@gmail.com',
-            password_hash(
-                password: 'zaq1@WSX',
-                algo: PASSWORD_BCRYPT,
-                options: [
-                    'cost' => 15,
-                ],
-            )
+            PasswordHasher::hash('zaq1@WSX')
         );
         $this->userAuthRepository->saveUser(user: $user);
         $manager->flush();

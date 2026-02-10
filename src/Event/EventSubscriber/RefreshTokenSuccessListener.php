@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Event\EventSubscriber;
 
-use App\Security\AuthService;
+use App\Security\ConfigServiceInterface;
 use App\Security\CookieService;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Events;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 final readonly class RefreshTokenSuccessListener
 {
     public function __construct(
-        private AuthService $authService,
+        private ConfigServiceInterface $configService,
         private RequestStack $requestStack,
         private CookieService $cookieService,
     ) {}
@@ -43,7 +43,7 @@ final readonly class RefreshTokenSuccessListener
             $this->cookieService->prepareAuthCookie(
                 name: CookieService::ACCESS_TOKEN,
                 token: $token,
-                expire: $this->authService->getAccessTokenTimeToLive(),
+                expire: $this->configService->getAccessTokenTimeToLive(),
             )
         );
     }

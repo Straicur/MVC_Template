@@ -11,11 +11,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 interface AuthServiceInterface
 {
+    /**
+     * @throws UnauthorizedException
+     */
+    public function getUserByEmailAndPassword(string $email, string $password): User;
+
     public function createToken(UserInterface $user): string;
-
-    public function getAccessTokenTimeToLive(): int;
-
-    public function getRefreshTokenTimeToLive(): int;
 
     /**
      * @throws UnauthorizedException
