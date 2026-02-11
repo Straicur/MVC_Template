@@ -19,4 +19,7 @@ class DatabaseMockManager
     {
         return $this->container->get($serviceName);
     }
+
+    //TODO ten plik jest fasadą która tworzy Factory i w konstruktorze przekazuje do nich odpowiednie serwisy
+    // Fatorka będzie miała jedną metodę create która
 }

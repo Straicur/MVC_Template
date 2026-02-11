@@ -15,7 +15,7 @@ use Override;
 class AppFixtures extends Fixture implements FixtureGroupInterface
 {
     public function __construct(
-        private readonly UserRepository $userAuthRepository,
+        private readonly UserRepository $userRepository,
     ) {}
 
     #[Override]
@@ -25,7 +25,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             'mosinskidamian11@gmail.com',
             PasswordHasher::hash('zaq1@WSX')
         );
-        $this->userAuthRepository->saveUser(user: $user);
+        $this->userRepository->saveUser(user: $user);
         $manager->flush();
     }
 
