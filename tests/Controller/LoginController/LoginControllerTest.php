@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Controller\LoginController;
 
 use App\Security\CookieService;
-use App\Tests\AbstractWebTest;
 use App\Tests\DTO\UserTestDTO;
+use App\Tests\WebTest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class LoginControllerTest extends AbstractWebTest
+class LoginControllerTest extends WebTest
 {
     public function testLoginCorrect(): void
     {

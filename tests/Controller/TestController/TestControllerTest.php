@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Controller\TestController;
 
 use App\Security\CookieService;
-use App\Tests\AbstractWebTest;
+use App\Tests\WebTest;
 use App\Tests\DTO\UserTestDTO;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class TestControllerTest extends AbstractWebTest
+class TestControllerTest extends WebTest
 {
     public function testTestCorrect(): void
     {

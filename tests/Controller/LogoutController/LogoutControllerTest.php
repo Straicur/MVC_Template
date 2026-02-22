@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Controller\LogoutController;
 
 use App\Security\CookieService;
-use App\Tests\AbstractWebTest;
+use App\Tests\WebTest;
 use App\Tests\DTO\UserTestDTO;
 use Symfony\Component\HttpFoundation\Request;
 
-class LogoutControllerTest extends AbstractWebTest
+class LogoutControllerTest extends WebTest
 {
     public function testLogoutCorrect(): void
     {
