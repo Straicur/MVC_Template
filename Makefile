@@ -6,6 +6,7 @@ start:
 	@echo '    migration       - create doctrine migration'
 	@echo '    migrate         - migrate database'
 	@echo '    entity          - create entity'
+	@echo '    test            - runs tests'
 	@echo '    rector          - rector preview'
 	@echo '    rector-fix      - rector apply fixes'
 	@echo '    cs              - cs preview'
@@ -18,6 +19,8 @@ migrate:
 	APP_ENV=test php bin/console doctrine:migrations:migrate
 entity:
 	php bin/console make:entity
+test:
+	php bin/phpunit
 rector:
 	composer rector
 rector-fix:
