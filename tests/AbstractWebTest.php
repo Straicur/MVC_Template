@@ -16,7 +16,6 @@ abstract class AbstractWebTest extends WebTestCase
     protected ?object $entityManager;
     protected ?DatabaseMockManager $databaseMockManager = null;
     protected ?TestTool $responseTool = null;
-    protected string $mainDir = '';
 
     protected function setUp(): void
     {
@@ -30,8 +29,6 @@ abstract class AbstractWebTest extends WebTestCase
 
         $this->entityManager = self::getContainer()->get('doctrine.orm.entity_manager');
         $this->entityManager->getConnection()->beginTransaction();
-
-        $this->mainDir = self::getContainer()->getParameter('app.main_dir');
     }
 
     protected function tearDown(): void
@@ -59,5 +56,10 @@ abstract class AbstractWebTest extends WebTestCase
     protected function getService(string $serviceName): object
     {
         return $this->webClient->getContainer()->get($serviceName);
+    }
+
+    protected function getCookieValueFromJar(string $name): ?string
+    {
+        return $this->webClient->getCookieJar()->get($name)?->getValue();
     }
 }

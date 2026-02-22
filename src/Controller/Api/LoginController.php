@@ -53,7 +53,7 @@ final class LoginController extends AbstractController
      * @throws UnauthorizedException
      * @throws UnprocessableContentException
      */
-    #[Route('/api/login', name: 'login', methods: ['POST'])]
+    #[Route('/api/login', name: 'login', methods: [Request::METHOD_POST])]
     #[OA\Post(
         description: 'Login endpoint',
         requestBody: new OA\RequestBody(

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Factory\User\DTO;
+namespace App\Tests\DTO;
 
 final readonly class UserTestDTO
 {

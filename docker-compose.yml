@@ -35,6 +35,7 @@ services:
             - ./docker/db/init:/docker-entrypoint-initdb.d:ro
         env_file:
             - .env
+            - .env.local
         healthcheck:
             test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
             timeout: 5s

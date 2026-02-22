@@ -21,6 +21,7 @@ entity:
 rector:
 	composer rector
 rector-fix:
+	composer rector:fix
 cs:
 	composer cs
 cs-fix:

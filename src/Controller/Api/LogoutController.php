@@ -21,7 +21,7 @@ final class LogoutController extends AbstractController
         private readonly TokenStorageInterface $tokenStorage,
     ) {}
 
-    #[Route('/api/logout', name: 'logout', methods: ['POST'])]
+    #[Route('/api/logout', name: 'logout', methods: [Request::METHOD_POST])]
     #[OA\Post(
         description: 'Logout endpoint',
         requestBody: new OA\RequestBody(),

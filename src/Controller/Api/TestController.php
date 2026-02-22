@@ -54,7 +54,7 @@ final class TestController extends AbstractController
      * @throws UnprocessableContentException
      * @throws ExceptionInterface
      */
-    #[Route('/api/test', name: 'test', methods: ['POST'])]
+    #[Route('/api/test', name: 'test', methods: [Request::METHOD_POST])]
     #[OA\Post(
         description: 'Test endpoint',
         requestBody: new OA\RequestBody(
