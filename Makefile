@@ -7,6 +7,7 @@ start:
 	@echo '    migrate         - migrate database'
 	@echo '    entity          - create entity'
 	@echo '    test            - runs tests'
+	@echo '    fixtures        - runs fixtures'
 	@echo '    rector          - rector preview'
 	@echo '    rector-fix      - rector apply fixes'
 	@echo '    cs              - cs preview'
@@ -21,6 +22,8 @@ entity:
 	php bin/console make:entity
 test:
 	php bin/phpunit
+fixtures:
+	php bin/console doctrine:fixtures:load -n
 rector:
 	composer rector
 rector-fix:
