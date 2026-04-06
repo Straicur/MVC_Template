@@ -41,7 +41,8 @@
         "symfony/uid": "7.4.*",
         "symfony/validator": "7.4.*",
         "symfony/yaml": "7.4.*",
-        "web-token/jwt-framework": "^4.1"
+        "web-token/jwt-framework": "^4.1",
+        "ext-xdebug": "*"
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^8.6",
