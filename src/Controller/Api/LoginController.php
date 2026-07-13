@@ -75,10 +75,6 @@ final class LoginController extends AbstractController
     ): Response {
         $loginRequestDTO = $this->requestService->getRequestBodyContent($request, LoginRequestDTO::class);
 
-        if (false === $loginRequestDTO instanceof LoginRequestDTO) {
-            throw new BadRequestException();
-        }
-
         $user = $this->authService->getUserByEmailAndPassword(
             email: $loginRequestDTO->getEmail(),
             password: $loginRequestDTO->getPassword()

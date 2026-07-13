@@ -9,12 +9,11 @@ use App\ExceptionManagement\Exceptions\ApiException\UnprocessableContentExceptio
 use App\ExceptionManagement\Exceptions\ApiException\UnprocessableContentException\ViolationModel;
 use Override;
 use Psr\Log\LoggerInterface;
-use Stringable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Throwable;
 
 class RequestService implements RequestServiceInterface
 {
@@ -31,36 +30,30 @@ class RequestService implements RequestServiceInterface
 
         try {
             $query = $this->serializer->deserialize($bodyContent, $className, JsonEncoder::FORMAT);
-        } catch (Throwable $exception) {
+        } catch (SerializerExceptionInterface $exception) {
             $this->logger->error($exception->getMessage());
             throw new BadRequestException();
         }
 
-        if ($query instanceof $className) {
-            $validationErrors = $this->validator->validate($query);
-            if ($validationErrors->count() > 0) {
-                $validationErrorModels = [];
-
-                for ($i = 0; $validationErrors->count() > $i; ++$i) {
-                    $validationError = $validationErrors->get($i);
-
-                    $validationMessage = $validationError->getMessage() instanceof Stringable ?
-                        $validationError->getMessage()->__toString() :
-                        $validationError->getMessage();
-
-                    $validationErrorModels[] = new ViolationModel(
-                        propertyPath: $validationError->getPropertyPath(),
-                        message: $validationMessage,
-                        code: $validationError->getCode(),
-                    );
-                }
-
-                throw new UnprocessableContentException(violations: $validationErrorModels);
-            }
-
-            return $query;
+        if (false === $query instanceof $className) {
+            throw new BadRequestException();
         }
 
-        throw new BadRequestException();
+        $validationErrors = $this->validator->validate($query);
+        if ($validationErrors->count() > 0) {
+            $validationErrorModels = [];
+
+            foreach ($validationErrors as $validationError) {
+                $validationErrorModels[] = new ViolationModel(
+                    propertyPath: $validationError->getPropertyPath(),
+                    message: (string) $validationError->getMessage(),
+                    code: $validationError->getCode(),
+                );
+            }
+
+            throw new UnprocessableContentException(violations: $validationErrorModels);
+        }
+
+        return $query;
     }
 }

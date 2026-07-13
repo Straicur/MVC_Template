@@ -77,10 +77,6 @@ final class TestController extends AbstractController
     ): Response {
         $testRequestDTO = $this->requestService->getRequestBodyContent($request, TestRequestDTO::class);
 
-        if (false === $testRequestDTO instanceof TestRequestDTO) {
-            throw new BadRequestException();
-        }
-
         $user = $this->authService->getUserFromAccessToken();
 
         $response = new TestRequestDTO(

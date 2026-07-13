@@ -11,6 +11,12 @@ use Symfony\Component\HttpFoundation\Request;
 interface RequestServiceInterface
 {
     /**
+     * @template T of object
+     *
+     * @param class-string<T> $className
+     *
+     * @return T
+     *
      * @throws BadRequestException
      * @throws UnprocessableContentException
      */
