@@ -6,9 +6,9 @@ namespace App\Tests;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Security\AuthService;
 use App\Security\ConfigService;
 use App\Security\CookieService;
+use App\Security\TokenService;
 use App\Tests\DTO\UserTestDTO;
 use App\Util\PasswordHasher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -48,9 +48,9 @@ class DatabaseMockManager
     public function loginUser(User $user): Cookie
     {
         /**
-         * @var AuthService $authService
+         * @var TokenService $tokenService
          */
-        $authService = $this->getService(AuthService::class);
+        $tokenService = $this->getService(TokenService::class);
         /**
          * @var ConfigService $configService
          */
@@ -60,7 +60,7 @@ class DatabaseMockManager
          */
         $cookieService = $this->getService(CookieService::class);
 
-        $token = $authService->createToken($user);
+        $token = $tokenService->createToken($user);
 
         return $cookieService->prepareAuthCookie(
             name: CookieService::ACCESS_TOKEN,

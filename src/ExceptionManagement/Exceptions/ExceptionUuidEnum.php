@@ -17,5 +17,7 @@ enum ExceptionUuidEnum: string
 
     case UNPROCESSABLE_CONTENT = 'e1f2a3b4-5c6d-4e7f-8123-abcdef123456';
 
+    case TOO_MANY_REQUESTS = 'a2b3c4d5-6e7f-4890-8123-fedcba987654';
+
     case INTERNAL_SERVER = 'f0e1d2c3-b4a5-4f6e-8123-112233445566';
 }

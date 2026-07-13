@@ -7,6 +7,8 @@ namespace App\Controller\Api;
 use App\DTO\Request\LoginRequestDTO;
 use App\ExceptionManagement\Exceptions\ApiException\BadRequestException\BadRequestException;
 use App\ExceptionManagement\Exceptions\ApiException\BadRequestException\BadRequestExceptionModel;
+use App\ExceptionManagement\Exceptions\ApiException\TooManyRequestsException\TooManyRequestsException;
+use App\ExceptionManagement\Exceptions\ApiException\TooManyRequestsException\TooManyRequestsExceptionModel;
 use App\ExceptionManagement\Exceptions\ApiException\UnauthorizedException\UnauthorizedException;
 use App\ExceptionManagement\Exceptions\ApiException\UnauthorizedException\UnauthorizedExceptionModel;
 use App\ExceptionManagement\Exceptions\ApiException\UnprocessableContentException\UnprocessableContentException;
@@ -15,6 +17,8 @@ use App\Security\AuthServiceInterface;
 use App\Security\ConfigServiceInterface;
 use App\Security\CookieService;
 use App\Security\CookieServiceInterface;
+use App\Security\LoginRateLimiterInterface;
+use App\Security\TokenServiceInterface;
 use App\Service\RequestServiceInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
@@ -38,6 +42,11 @@ use Symfony\Component\Routing\Attribute\Route;
     description: 'Unprocessable Content',
     content: new Model(type: UnprocessableContentExceptionModel::class)
 )]
+#[OA\Response(
+    response: 429,
+    description: 'Too Many Requests',
+    content: new Model(type: TooManyRequestsExceptionModel::class)
+)]
 #[OA\Tag(name: 'Auth')]
 final class LoginController extends AbstractController
 {
@@ -45,13 +54,16 @@ final class LoginController extends AbstractController
         private readonly RequestServiceInterface $requestService,
         private readonly CookieServiceInterface $cookieService,
         private readonly AuthServiceInterface $authService,
+        private readonly TokenServiceInterface $tokenService,
         private readonly ConfigServiceInterface $configService,
+        private readonly LoginRateLimiterInterface $loginRateLimiter,
     ) {}
 
     /**
      * @throws BadRequestException
      * @throws UnauthorizedException
      * @throws UnprocessableContentException
+     * @throws TooManyRequestsException
      */
     #[Route('/api/login', name: 'login', methods: [Request::METHOD_POST])]
     #[OA\Post(
@@ -73,6 +85,8 @@ final class LoginController extends AbstractController
     public function login(
         Request $request,
     ): Response {
+        $this->loginRateLimiter->consume($request);
+
         $loginRequestDTO = $this->requestService->getRequestBodyContent($request, LoginRequestDTO::class);
 
         $user = $this->authService->getUserByEmailAndPassword(
@@ -82,7 +96,7 @@ final class LoginController extends AbstractController
 
         $response = new Response();
 
-        $token = $this->authService->createToken($user);
+        $token = $this->tokenService->createToken($user);
         $response->headers->setCookie(
             $this->cookieService->prepareAuthCookie(
                 name: CookieService::ACCESS_TOKEN,
@@ -91,7 +105,7 @@ final class LoginController extends AbstractController
             )
         );
 
-        $refreshToken = $this->authService->createRefreshToken($user);
+        $refreshToken = $this->tokenService->createRefreshToken($user);
         $response->headers->setCookie(
             $this->cookieService->prepareAuthCookie(
                 name: CookieService::REFRESH_TOKEN,

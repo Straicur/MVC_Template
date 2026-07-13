@@ -75,7 +75,7 @@ final class TestController extends AbstractController
     public function test(
         Request $request,
     ): Response {
-        $testRequestDTO = $this->requestService->getRequestBodyContent($request, TestRequestDTO::class);
+        $this->requestService->getRequestBodyContent($request, TestRequestDTO::class);
 
         $user = $this->authService->getUserFromAccessToken();
 
